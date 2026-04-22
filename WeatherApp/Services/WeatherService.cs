@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Avalonia.Media;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -43,13 +45,26 @@ namespace WeatherApp.Services
             };
             options.Converters.Add(new WeatherJsonConverter());
 
-            // Вызовите API погоды, используя HttpClient. Подробнее: https://openweathermap.org/current#name
+            string url = $"https://api.openweathermap.org/data/2.5/weather?q={cityName}&appid={_apiKey}&units=metric&lang=ru";
 
-            // Десериализуйте ответ в объект Weather, используйте в методе опцию, указанную выше
+            using (HttpClient client = new HttpClient())
+            {
+                var response = await client.GetAsync(url);
 
-            // Верните объект Weather
+                if (response.IsSuccessStatusCode)
+                {
+                    var jsonResponse = await response.Content.ReadAsStringAsync();
 
-            throw new NotImplementedException(); //Уберите после реализации кода
+                    var weatherData = JsonSerializer.Deserialize<Weather>(jsonResponse, options);
+
+                    return weatherData;
+                }
+                else
+                {
+                    throw new Exception($"Не удалось получить данные о погоде: {response.StatusCode}");
+                }
+            }
+
         }
 
         /// <summary>
@@ -67,13 +82,26 @@ namespace WeatherApp.Services
             };
             options.Converters.Add(new WeatherJsonConverter());
 
-            // Вызовите API погоды, используя HttpClient. Подробнее: https://openweathermap.org/current
+            string url = $"https://api.openweathermap.org/data/2.5/weather?lat={latitude}&lon={longitude}&units=metric&lang=ru&appid={_apiKey}";
 
-            // Десериализуйте ответ в объект Weather, используйте в методе опцию, указанную выше
+            using (HttpClient client = new HttpClient())
+            {
+                var response = await client.GetAsync(url);
 
-            // Верните объект Weather
+                if (response.IsSuccessStatusCode)
+                {
+                    var jsonResponse = await response.Content.ReadAsStringAsync();
 
-            throw new NotImplementedException(); //Уберите после реализации кода
+                    var weatherData = JsonSerializer.Deserialize<Weather>(jsonResponse, options);
+
+                    return weatherData;
+                }
+                else
+                {
+                    throw new Exception("Не удалось получить данные о погоде по координатам");
+                }
+            }
+
         }
 
         /// <summary>
@@ -91,13 +119,26 @@ namespace WeatherApp.Services
             };
             options.Converters.Add(new CityJsonConverter());
 
-            // Вызовите географическое API, используя HttpClient. Подробнее: https://openweathermap.org/api/geocoding-api 
+            string url = $"http://api.openweathermap.org/geo/1.0/direct?q={cityName}&limit=5&appid={_apiKey}\"";
 
-            // Десериализуйте ответ в список объектов City, используйте в методе опцию, указанную выше
+            using (HttpClient client = new HttpClient())
+            {
+                var response = await client.GetAsync(url);
 
-            // Верните список City
+                if (response.IsSuccessStatusCode)
+                {
+                    var jsonResponse = await response.Content.ReadAsStringAsync();
 
-            throw new NotImplementedException(); //Уберите после реализации кода
+                    var cities = JsonSerializer.Deserialize<List<City>>(jsonResponse, options);
+
+                    return cities ?? new List<City>();
+                }
+                else
+                {
+                    throw new Exception("Ошибка при поиске города");
+                }
+
+            }
         }
     }
 }

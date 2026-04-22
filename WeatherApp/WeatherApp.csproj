@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="appsettings.json">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
 
@@ -33,5 +33,9 @@
     <Compile Update="Views\WeatherView.axaml.cs">
       <DependentUpon>WeatherView.axaml</DependentUpon>
     </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Image\" />
   </ItemGroup>
 </Project>
